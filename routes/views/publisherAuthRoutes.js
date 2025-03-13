@@ -10,11 +10,23 @@ router.get('/register', (req, res) => {
 // Handle publisher registration
 router.post('/register', async (req, res) => {
 	const { name, username, password, bio } = req.body;
+
+	// Validation
+	if (!name || !username || !password) {
+		return res.status(400).render('publishers/register', { errorMessage: 'All fields are required' });
+	}
+	if (password.length < 6) {
+		return res.status(400).render('publishers/register', { errorMessage: 'Password must be at least 6 characters' });
+	}
+
 	try {
+		// Check if username already exists
 		const existingPublisher = await Publisher.findOne({ username });
 		if (existingPublisher) {
 			return res.status(400).render('publishers/register', { errorMessage: 'Username already exists' });
 		}
+
+		// Create new publisher
 		const publisher = new Publisher({ name, username, password, bio });
 		await publisher.save();
 		res.redirect('/publishers/login');
@@ -33,15 +45,20 @@ router.get('/login', (req, res) => {
 // Handle publisher login
 router.post('/login', async (req, res) => {
 	const { username, password } = req.body;
+
 	try {
+		// Find publisher by username
 		const publisher = await Publisher.findOne({ username });
 		if (!publisher) {
 			return res.status(400).render('publishers/login', { errorMessage: 'Invalid username or password' });
 		}
+
+		// Compare passwords
 		const isMatch = await publisher.comparePassword(password);
 		if (!isMatch) {
 			return res.status(400).render('publishers/login', { errorMessage: 'Invalid username or password' });
 		}
+
 		// Set session for the authenticated publisher
 		req.session.publisher = publisher;
 		res.redirect('/publishers/dashboard');
@@ -57,7 +74,7 @@ router.get('/dashboard', (req, res) => {
 	if (!req.session.publisher) {
 		return res.redirect('/publishers/login');
 	}
-	res.render('publishers/dashboard', { publisher: req.session.publisher });
+	res.render('publishers/dashboard');
 });
 
 // Publisher logout
