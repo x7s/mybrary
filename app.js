@@ -19,24 +19,31 @@ const viewPublisherRoutes = require('./routes/views/publisherRoutes');
 const publisherAuthRoutes = require('./routes/views/publisherAuthRoutes');
 
 dotenv.config();
-connectDB();
 
 const app = express();
+// Connect to the database
+connectDB();
+// Middleware to parse request bodies
+app.use(express.urlencoded({ extended: true }));
 
-// Middleware
-// For API
-app.use(express.json());
 // Configure express-session
 app.use(
 	session({
-	  secret: process.env.SESSION_SECRET || 'your-secret-key',
-	  resave: false,
-	  saveUninitialized: false,
-	  cookie: { secure: false },
+		secret: process.env.SESSION_SECRET || 'your-secret-key', // Use environment variable or fallback
+		resave: false,
+		saveUninitialized: false,
+		cookie: { secure: false }, // Set to true if using HTTPS
 	}),
 );
-// For forms
-app.use(express.urlencoded({ extended: true }));
+
+// Middleware to pass session data to all views
+app.use((req, res, next) => {
+	res.locals.session = req.session; // Make session available in all views
+	next();
+});
+// For API
+app.use(express.json());
+
 // For PUT and DELETE methods
 app.use(methodOverride('_method'));
 
@@ -57,6 +64,7 @@ app.use('/admin', adminRoutes);
 app.use('/authors', viewAuthorRoutes);
 app.use('/books', viewBookRoutes);
 app.use('/publisher', viewPublisherRoutes);
+// Routes
 app.use('/publishers', publisherAuthRoutes);
 
 // Homepage
@@ -76,17 +84,8 @@ app.get('/', async (req, res) => {
 		res.status(500).send('Server Error');
 	}
 });
-// Admin part
-app.use(
-	session({
-	  secret: 'thisismysecurekeynow',
-	  resave: false,
-	  saveUninitialized: false,
-	  // Cookies set to true if using HTTPS
-	  cookie: { secure: false },
-	}),
-);
 
+// Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`);
