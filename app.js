@@ -16,6 +16,7 @@ const adminRoutes = require('./routes/views/adminRoutes');
 const viewAuthorRoutes = require('./routes/views/authorRoutes');
 const viewBookRoutes = require('./routes/views/bookRoutes');
 const viewPublisherRoutes = require('./routes/views/publisherRoutes');
+const loginRoutes = require('./routes/views/loginRoutes');
 const publisherAuthRoutes = require('./routes/views/publisherAuthRoutes');
 
 dotenv.config();
@@ -64,6 +65,7 @@ app.use('/admin', adminRoutes);
 app.use('/authors', viewAuthorRoutes);
 app.use('/books', viewBookRoutes);
 app.use('/publisher', viewPublisherRoutes);
+app.use('/', loginRoutes);
 // Routes
 app.use('/publishers', publisherAuthRoutes);
 
