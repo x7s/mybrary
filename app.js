@@ -15,7 +15,7 @@ const apiPublisherRoutes = require('./routes/api/publisherRoutes');
 const adminRoutes = require('./routes/views/adminRoutes');
 const viewAuthorRoutes = require('./routes/views/authorRoutes');
 const viewBookRoutes = require('./routes/views/bookRoutes');
-const viewPublisherRoutes = require('./routes/views/publisherRoutes');
+const publisherRoutes = require('./routes/views/publisherRoutes');
 const loginRoutes = require('./routes/views/loginRoutes');
 const publisherAuthRoutes = require('./routes/views/publisherAuthRoutes');
 
@@ -64,7 +64,7 @@ app.use('/api/publishers', apiPublisherRoutes);
 app.use('/admin', adminRoutes);
 app.use('/authors', viewAuthorRoutes);
 app.use('/books', viewBookRoutes);
-app.use('/publisher', viewPublisherRoutes);
+app.use('/publishers', publisherRoutes);
 app.use('/', loginRoutes);
 // Routes
 app.use('/publishers', publisherAuthRoutes);
