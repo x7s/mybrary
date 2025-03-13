@@ -7,6 +7,7 @@
 <body>
   <h1>Welcome, <%= session.publisher.name %></h1>
   <p><%= session.publisher.bio %></p>
+  <a href="/publishers/edit">Edit Account</a>
   <a href="/publishers/logout">Logout</a>
   <%- include('../partials/footer') %>
 </body>

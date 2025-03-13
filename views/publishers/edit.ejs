@@ -6,10 +6,18 @@
 </head>
 <body>
   <h1>Edit Publisher</h1>
-  <form action="/publishers/<%= publisher.id %>?_method=PUT" method="POST">
+  <form action="/publishers/edit?_method=PUT" method="POST">
     <div class="form-row">
       <label for="name">Name:</label>
       <input type="text" id="name" name="name" value="<%= publisher.name %>" required>
+    </div>
+    <div class="form-row">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" value="<%= publisher.username %>" required>
+    </div>
+    <div class="form-row">
+      <label for="password">Password (leave blank to keep current):</label>
+      <input type="password" id="password" name="password">
     </div>
     <div class="form-row">
       <label for="bio">Bio:</label>
@@ -19,7 +27,7 @@
       <button class="btn btn-primary" type="submit">Update Publisher</button>
     </div>
   </form>
-  <a href="/publishers/<%= publisher.id %>">Back to Publisher</a>
+  <a href="/publishers/dashboard">Back to Dashboard</a>
   <%- include('../partials/footer') %>
 </body>
 </html>

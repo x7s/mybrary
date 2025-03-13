@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Publisher = require('../../models/Publisher');
+const authMiddleware = require('../../middleware/authMiddleware');
 
 // Render publisher registration form
 router.get('/register', (req, res) => {
@@ -75,6 +76,52 @@ router.get('/dashboard', (req, res) => {
 		return res.redirect('/publishers/login');
 	}
 	res.render('publishers/dashboard');
+});
+
+// Render publisher edit form (publisher only)
+router.get('/edit', authMiddleware, async (req, res) => {
+	try {
+	  const publisher = await Publisher.findById(req.session.publisher._id);
+	  if (!publisher) {
+			return res.redirect('/publishers/dashboard');
+	  }
+	  res.render('publishers/edit', { publisher });
+	}
+	catch (err) {
+	  console.error(err);
+	  res.redirect('/publishers/dashboard');
+	}
+});
+
+// Handle publisher update (publisher only)
+router.put('/edit', authMiddleware, async (req, res) => {
+	let publisher;
+	try {
+	  publisher = await Publisher.findById(req.session.publisher._id);
+	  if (!publisher) {
+			return res.redirect('/publishers/dashboard');
+	  }
+	  publisher.name = req.body.name;
+	  publisher.username = req.body.username;
+	  publisher.bio = req.body.bio;
+	  if (req.body.password) {
+			publisher.password = req.body.password; // Password will be hashed by the pre-save hook
+	  }
+	  await publisher.save();
+	  res.redirect('/publishers/dashboard');
+	}
+	catch (err) {
+	  console.error(err);
+	  if (publisher) {
+			res.render('publishers/edit', {
+		  publisher: publisher,
+		  errorMessage: 'Error updating Publisher',
+			});
+	  }
+	  else {
+			res.redirect('/publishers/dashboard');
+	  }
+	}
 });
 
 // Publisher logout
