@@ -3,14 +3,15 @@ const router = express.Router();
 const Publisher = require('../../models/Publisher');
 const Book = require('../../models/Book');
 
-// Render publisher list
+// Render list of publishers
 router.get('/', async (req, res) => {
 	try {
-		const publishers = await Publisher.find();
-		res.render('publishers/index', { publishers });
+	  const publishers = await Publisher.find();
+	  res.render('publishers/index', { publishers });
 	}
-	catch {
-		res.redirect('/');
+	catch (err) {
+	  console.error(err);
+	  res.redirect('/');
 	}
 });
 
