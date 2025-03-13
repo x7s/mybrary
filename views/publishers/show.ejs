@@ -11,8 +11,8 @@
   <!-- Show edit and delete buttons only for admin -->
   <% if (session.admin) { %>
     <div>
-      <a href="/publishers/<%= publisher.id %>/edit" class="btn btn-primary">Edit</a>
-      <form action="/publishers/<%= publisher.id %>?_method=DELETE" method="POST" style="display: inline;">
+      <a href="/admin/publishers/<%= publisher.id %>/edit" class="btn btn-primary">Edit</a>
+      <form action="/admin/publishers/<%= publisher.id %>?_method=DELETE" method="POST" style="display: inline;">
         <button type="submit" class="btn btn-danger">Delete</button>
       </form>
     </div>
