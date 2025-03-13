@@ -5,8 +5,8 @@
   <title>Publisher Dashboard</title>
 </head>
 <body>
-  <h1>Welcome, <%= publisher.name %></h1>
-  <p><%= publisher.bio %></p>
+  <h1>Welcome, <%= session.publisher.name %></h1>
+  <p><%= session.publisher.bio %></p>
   <a href="/publishers/logout">Logout</a>
   <%- include('../partials/footer') %>
 </body>
