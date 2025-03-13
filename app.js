@@ -29,7 +29,7 @@ app.use(express.json());
 // Configure express-session
 app.use(
 	session({
-	  secret: 'thisismysecretkey',
+	  secret: process.env.SESSION_SECRET || 'your-secret-key',
 	  resave: false,
 	  saveUninitialized: false,
 	  cookie: { secure: false },
