@@ -46,36 +46,38 @@ router.get('/login', (req, res) => {
 // Handle publisher login
 router.post('/login', async (req, res) => {
 	const { username, password } = req.body;
-
 	try {
-		// Find publisher by username
-		const publisher = await Publisher.findOne({ username });
-		if (!publisher) {
+	  const publisher = await Publisher.findOne({ username });
+	  if (!publisher) {
 			return res.status(400).render('publishers/login', { errorMessage: 'Invalid username or password' });
-		}
-
-		// Compare passwords
-		const isMatch = await publisher.comparePassword(password);
-		if (!isMatch) {
+	  }
+	  const isMatch = await publisher.comparePassword(password);
+	  if (!isMatch) {
 			return res.status(400).render('publishers/login', { errorMessage: 'Invalid username or password' });
-		}
-
-		// Set session for the authenticated publisher
-		req.session.publisher = publisher;
-		res.redirect('/publishers/dashboard');
+	  }
+	  // Set session for the authenticated publisher
+	  req.session.publisher = publisher;
+	  res.redirect('/publishers/dashboard'); // Redirect to the dashboard after login
 	}
 	catch (err) {
-		console.error(err);
-		res.status(500).render('publishers/login', { errorMessage: 'Server error' });
+	  console.error(err);
+	  res.status(500).render('publishers/login', { errorMessage: 'Server error' });
 	}
 });
 
-// Publisher dashboard (protected route)
-router.get('/dashboard', (req, res) => {
-	if (!req.session.publisher) {
-		return res.redirect('/publishers/login');
+// Render publisher dashboard (publisher only)
+router.get('/dashboard', authMiddleware, async (req, res) => {
+	try {
+	  const publisher = await Publisher.findById(req.session.publisher._id);
+	  if (!publisher) {
+			return res.redirect('/publishers/login');
+	  }
+	  res.render('publishers/dashboard', { publisher });
 	}
-	res.render('publishers/dashboard');
+	catch (err) {
+	  console.error(err);
+	  res.redirect('/publishers/login');
+	}
 });
 
 // Render publisher edit form (publisher only)
