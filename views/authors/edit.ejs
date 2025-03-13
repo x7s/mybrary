@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/header') %>
+</head>
+<body>
+  <h2 class="page-header">Редактиране на автора</h2>
+  <form action="/authors/<%= author.id %>?_method=PUT" method="POST">
+    <%- include('_form_fields') %>
+    <div class="form-row form-row-end btn-row">
+      <a class="btn btn-danger" href="/authors/<%= author.id %>">Отказ</a>
+      <button class="btn btn-primary" type="submit">Актуализирай</button>
+    </div>
+  </form>
+  <%- include('../partials/footer') %>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/header') %>
+  <title>Edit Publisher</title>
+</head>
+<body>
+  <h1>Edit Publisher</h1>
+  <form action="/publishers/<%= publisher.id %>?_method=PUT" method="POST">
+    <div class="form-row">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" value="<%= publisher.name %>" required>
+    </div>
+    <div class="form-row">
+      <label for="bio">Bio:</label>
+      <textarea id="bio" name="bio"><%= publisher.bio %></textarea>
+    </div>
+    <div class="form-row form-row-end btn-row">
+      <button class="btn btn-primary" type="submit">Update Publisher</button>
+    </div>
+  </form>
+  <a href="/publishers/<%= publisher.id %>">Back to Publisher</a>
+  <%- include('../partials/footer') %>
+</body>
+</html>

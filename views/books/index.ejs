@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/header') %>
+</head>
+<body>
+  <h1>Books</h1>
+  <!-- <a href="/books/new">New Book</a> -->
+  <!-- Show new book button only for admin -->
+  <% if (req.session.admin) { %>
+    <div>
+      <a href="/books/new" class="btn btn-primary">New Book</a>
+    </div>
+  <% } %>
+  <ul>
+    <% books.forEach(book => { %>
+      <li>
+        <a href="/books/<%= book.id %>"><%= book.title %></a>
+        <span> by <%= book.author.name %></span>
+      </li>
+    <% }) %>
+  </ul>
+  <%- include('../partials/footer') %>
+</body>
+</html>

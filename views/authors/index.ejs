@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/header') %>
+</head>
+<body>
+  <h1>Authors</h1>
+  <!-- <a href="/authors/new">New Author</a> -->
+  <!-- Show new author button only for admin -->
+  <% if (req.session.admin) { %>
+    <div>
+      <a href="/authors/new" class="btn btn-primary">New Author</a>
+    </div>
+  <% } %>
+  <ul>
+    <% authors.forEach(author => { %>
+      <li>
+        <a href="/authors/<%= author.id %>"><%= author.name %></a>
+      </li>
+    <% }) %>
+  </ul>
+  <%- include('../partials/footer') %>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/header') %>
+</head>
+<body>
+  <h2 class="page-header">Нов автор</h2>
+  <form action="/authors" method="POST">
+    <%- include('_form_fields') %>
+    <div class="form-row form-row-end btn-row">
+      <a class="btn btn-danger" href="/authors">Отказ</a>
+      <button class="btn btn-primary" type="submit">Създай</button>
+    </div>
+  </form>
+  <%- include('../partials/footer') %>
+</body>
+</html>

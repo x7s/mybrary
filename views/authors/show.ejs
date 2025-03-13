@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/header') %>
+  <title><%= author.name %></title>
+</head>
+<body>
+  <h1><%= author.name %></h1>
+  <p><%= author.bio %></p>
+
+  <!-- Show edit and delete buttons only for admin -->
+  <% if (req.session.admin) { %>
+    <div>
+      <a href="/authors/<%= author.id %>/edit" class="btn btn-primary">Edit</a>
+      <form action="/authors/<%= author.id %>?_method=DELETE" method="POST" style="display: inline;">
+        <button type="submit" class="btn btn-danger">Delete</button>
+      </form>
+    </div>
+  <% } %>
+
+  <a href="/authors">Back to Authors</a>
+  <%- include('../partials/footer') %>
+</body>
+</html>

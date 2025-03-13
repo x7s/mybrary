@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/header') %>
+  <title>Publisher Registration</title>
+</head>
+<body>
+  <h1>Publisher Registration</h1>
+  <form action="/publishers/register" method="POST">
+    <div class="form-row">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required>
+    </div>
+    <div class="form-row">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required>
+    </div>
+    <div class="form-row">
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+    </div>
+    <div class="form-row">
+      <label for="bio">Bio:</label>
+      <textarea id="bio" name="bio"></textarea>
+    </div>
+    <div class="form-row form-row-end btn-row">
+      <button class="btn btn-primary" type="submit">Register</button>
+    </div>
+  </form>
+  <%- include('../partials/footer') %>
+</body>
+</html>

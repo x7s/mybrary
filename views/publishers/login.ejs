@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/header') %>
+  <title>Publisher Login</title>
+</head>
+<body>
+  <h1>Publisher Login</h1>
+  <form action="/publishers/login" method="POST">
+    <div class="form-row">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required>
+    </div>
+    <div class="form-row">
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+    </div>
+    <div class="form-row form-row-end btn-row">
+      <button class="btn btn-primary" type="submit">Login</button>
+    </div>
+  </form>
+  <%- include('../partials/footer') %>
+</body>
+</html>
