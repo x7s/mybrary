@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Admin = require('../../models/Admin');
+const Publisher = require('../../models/Publisher');
+const authMiddleware = require('../../middleware/authMiddleware');
 
 // Render admin login form
 router.get('/login', (req, res) => {
@@ -35,6 +37,76 @@ router.get('/dashboard', (req, res) => {
 		return res.redirect('/admin/login');
 	}
 	res.render('admin/dashboard');
+});
+
+// Render list of publishers (admin only)
+router.get('/publishers', authMiddleware, async (req, res) => {
+	try {
+	  const publishers = await Publisher.find();
+	  res.render('admin/publishers/index', { publishers });
+	}
+	catch (err) {
+	  console.error(err);
+	  res.redirect('/admin/dashboard');
+	}
+});
+
+// Render edit publisher form (admin only)
+router.get('/publishers/:id/edit', authMiddleware, async (req, res) => {
+	try {
+	  const publisher = await Publisher.findById(req.params.id);
+	  if (!publisher) {
+			return res.redirect('/admin/publishers');
+	  }
+	  res.render('admin/publishers/edit', { publisher });
+	}
+	catch (err) {
+	  console.error(err);
+	  res.redirect('/admin/publishers');
+	}
+});
+
+// Handle publisher update (admin only)
+router.put('/publishers/:id', authMiddleware, async (req, res) => {
+	let publisher;
+	try {
+	  publisher = await Publisher.findById(req.params.id);
+	  if (!publisher) {
+			return res.redirect('/admin/publishers');
+	  }
+	  publisher.name = req.body.name;
+	  publisher.username = req.body.username;
+	  publisher.bio = req.body.bio;
+	  if (req.body.password) {
+			publisher.password = req.body.password; // Password will be hashed by the pre-save hook
+	  }
+	  await publisher.save();
+	  res.redirect('/admin/publishers');
+	}
+	catch (err) {
+	  console.error(err);
+	  if (publisher) {
+			res.render('admin/publishers/edit', {
+		  publisher: publisher,
+		  errorMessage: 'Error updating Publisher',
+			});
+	  }
+	  else {
+			res.redirect('/admin/publishers');
+	  }
+	}
+});
+
+// Handle publisher deletion (admin only)
+router.delete('/publishers/:id', authMiddleware, async (req, res) => {
+	try {
+	  await Publisher.findByIdAndDelete(req.params.id);
+	  res.redirect('/admin/publishers');
+	}
+	catch (err) {
+	  console.error(err);
+	  res.redirect('/admin/publishers');
+	}
 });
 
 // Admin logout

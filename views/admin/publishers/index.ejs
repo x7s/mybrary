@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../../partials/header') %>
+  <title>Admin - Publishers</title>
+</head>
+<body>
+  <h1>Publishers</h1>
+  <ul>
+    <% publishers.forEach(publisher => { %>
+      <li>
+        <a href="/admin/publishers/<%= publisher.id %>/edit"><%= publisher.name %></a>
+        <form action="/admin/publishers/<%= publisher.id %>?_method=DELETE" method="POST" style="display: inline;">
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      </li>
+    <% }) %>
+  </ul>
+  <a href="/admin/dashboard">Back to Dashboard</a>
+  <%- include('../../partials/footer') %>
+</body>
+</html>
