@@ -43,9 +43,17 @@ app.use(
 		secret: process.env.SESSION_SECRET || 'your-secret-key',
 		resave: false,
 		saveUninitialized: false,
-		cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true },
+		cookie: {
+			// Работи само с HTTPS в production
+			secure: process.env.NODE_ENV === 'production',
+			// Предпазва от XSS атаки
+			httpOnly: true,
+			// Защита срещу CSRF атаки
+			sameSite: 'strict',
+		},
 	}),
 );
+
 
 // Middleware to pass session data to all views
 app.use((req, res, next) => {
