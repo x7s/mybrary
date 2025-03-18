@@ -7,6 +7,7 @@ const session = require('express-session');
 const Book = require('./models/Book');
 const helmet = require('helmet');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 
 // Import API routes
 const apiAuthorRoutes = require('./routes/api/authorRoutes');
