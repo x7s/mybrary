@@ -1,28 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bg">
 <head>
   <%- include('../partials/header') %>
   <title><%= book.title %></title>
 </head>
 <body>
   <h1><%= book.title %></h1>
-  <p>Author: <%= book.author.name %></p>
-  <p>Publisher: <%= book.publisher.name %></p>
-  <p>Published on: <%= book.publishDate.toDateString() %></p>
-  <p>Page Count: <%= book.pageCount %></p>
-  <p>Description: <%= book.description %></p>
+  <p>Автор: <%= book.author.name %></p>
+  <p>Потребител: <%= book.publisher.name %></p>
+  <p>Публикувано на: <%= book.publishDate.toDateString() %></p>
+  <p>Брой страници: <%= book.pageCount %></p>
+  <p>Описание: <%= book.description %></p>
 
   <!-- Show edit and delete buttons only for admin -->
   <% if (session.admin) { %>
     <div>
-      <a href="/books/<%= book.id %>/edit" class="btn btn-primary">Edit</a>
+      <a href="/books" class="btn btn-danger">Всички Книги</a>
+      <a href="/books/<%= book.id %>/edit" class="btn btn-primary">Редактиране</a>
       <form action="/books/<%= book.id %>?_method=DELETE" method="POST" style="display: inline;">
-        <button type="submit" class="btn btn-danger">Delete</button>
+        <button type="submit" class="btn btn-danger">Изтриване</button>
       </form>
     </div>
   <% } %>
 
-  <a href="/books">Back to Books</a>
   <%- include('../partials/footer') %>
 </body>
 </html>

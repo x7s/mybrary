@@ -4,20 +4,20 @@
       <% if (book.coverImagePath) { %>
         <img src="<%= book.coverImagePath %>" alt="<%= book.title %> Cover" class="book-cover">
       <% } else { %>
-        <div class="book-cover-placeholder">No Cover</div>
+        <div class="book-cover-placeholder">Все още няма корица</div>
       <% } %>
       <h3 class="book-title"><%= book.title %></h3>
       <% if (book.author) { %>
         <p class="book-author"><%= book.author.name %></p>
       <% } else { %>
-        <p class="book-author">Unknown Author</p>
+        <p class="book-author">Неизвестен Автор</p>
       <% } %>
       <% if (book.publisher) { %>
         <p class="book-publisher"><%= book.publisher.name %></p>
       <% } else { %>
-        <p class="book-publisher">Unknown Publisher</p>
+        <p class="book-publisher">Неизвестен Потребител</p>
       <% } %>
-      <a href="/books/<%= book.id %>" class="btn btn-primary">View Details</a>
+      <a href="/books/<%= book.id %>" class="btn btn-primary">Вижте подробности</a>
     </div>
   <% }) %>
 </div>

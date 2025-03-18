@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bg">
 <head>
   <%- include('../partials/header') %>
 </head>
 <body>
-  <h1>Books</h1>
+  <h1>Книги</h1>
   <!-- <a href="/books/new">New Book</a> -->
   <!-- Show new book button only for admin -->
   <% if (req.session.admin) { %>
     <div>
-      <a href="/books/new" class="btn btn-primary">New Book</a>
+      <a href="/books/new" class="btn btn-primary">Нова Книга</a>
     </div>
   <% } %>
   <ul>

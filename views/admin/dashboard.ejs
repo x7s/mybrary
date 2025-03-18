@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bg">
 <head>
   <%- include('../partials/header') %>
-  <title>Admin Dashboard</title>
+  <title>Администраторско табло</title>
 </head>
 <body>
-  <h1>Admin Dashboard</h1>
-  <p>Welcome, Grand Administrator!</p>
+  <h1>Администраторско табло</h1>
+  <p>Добре дошъл, Aдминистратор!</p>
   <ul>
-    <li><a href="/books">Manage Books</a></li>
-    <li><a href="/authors">Manage Authors</a></li>
-    <li><a href="/admin/publishers">Manage Publishers</a></li>
+    <li><a href="/books">Управление на Книги</a></li>
+    <li><a href="/authors">Управление на Автори</a></li>
+    <li><a href="/admin/publishers">Управление на Потребители</a></li>
   </ul>
-  <a href="/admin/logout">Logout</a>
+  <a href="/admin/logout" class="btn btn-danger">Изход</a>
   <%- include('../partials/footer') %>
 </body>
 </html>
