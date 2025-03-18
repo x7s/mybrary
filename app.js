@@ -39,18 +39,18 @@ app.use(express.urlencoded({ extended: true }));
 
 // Configure express-session
 app.use(
-    session({
-        secret: process.env.SESSION_SECRET || 'your-secret-key',
-        resave: false,
-        saveUninitialized: false,
-        cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true },
-    }),
+	session({
+		secret: process.env.SESSION_SECRET || 'your-secret-key',
+		resave: false,
+		saveUninitialized: false,
+		cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true },
+	}),
 );
 
 // Middleware to pass session data to all views
 app.use((req, res, next) => {
-    res.locals.session = req.session;
-    next();
+	res.locals.session = req.session;
+	next();
 });
 // Middleware за глобална обработка на грешки
 app.use(errorHandler);
@@ -68,6 +68,17 @@ app.set('views', path.join(__dirname, 'views'));
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Rate limiting middleware
+const apiLimiter = rateLimit({
+	// 15 минути
+	windowMs: 15 * 60 * 1000,
+	// Макс 100 заявки на IP
+	max: 100,
+	message: { error: 'Too many requests, please try again later.' },
+});
+
+// Приложи rate-limiting към всички API маршрути
+app.use('/api/', apiLimiter);
 // API Routes
 app.use('/api/authors', apiAuthorRoutes);
 app.use('/api/books', apiBookRoutes);
@@ -83,28 +94,11 @@ app.use('/publishers', publisherAuthRoutes);
 
 // Homepage
 app.get('/', async (req, res) => {
-    try {
-        const books = await Book.find()
-            .populate('author')
-            .populate('publisher')
-            .limit(10)
-            .sort({ createdAt: -1 });
-        res.render('index', { books });
-    }
-    catch (error) {
-        console.error(error);
-        res.status(500).send('Server Error');
-    }
-});
-
-// Start the server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
-			// Limit to 10 recently added books
+	try {
+		const books = await Book.find()
+			.populate('author')
+			.populate('publisher')
 			.limit(10)
-			// Sort by creation date (newest first)
 			.sort({ createdAt: -1 });
 		res.render('index', { books });
 	}
