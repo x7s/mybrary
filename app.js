@@ -8,6 +8,7 @@ const Book = require('./models/Book');
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+const errorHandler = require('./middleware/errorHandler');
 
 // Import API routes
 const apiAuthorRoutes = require('./routes/api/authorRoutes');
@@ -51,6 +52,8 @@ app.use((req, res, next) => {
     res.locals.session = req.session;
     next();
 });
+// Middleware за глобална обработка на грешки
+app.use(errorHandler);
 
 // For API
 app.use(express.json());
