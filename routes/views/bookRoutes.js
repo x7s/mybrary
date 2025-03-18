@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const authMiddleware = require('../../middleware/authMiddleware');
+const { authAdmin } = require('../../middleware/authMiddleware');
 const Book = require('../../models/Book');
 const Author = require('../../models/Author');
 const Publisher = require('../../models/Publisher');
@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
 });
 
 // Render new book form
-router.get('/new', authMiddleware, async (req, res) => {
+router.get('/new', authAdmin, async (req, res) => {
 	try {
 		const authors = await Author.find();
 		const publishers = await Publisher.find();
@@ -29,7 +29,7 @@ router.get('/new', authMiddleware, async (req, res) => {
 });
 
 // Create book (SSR form submission)
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authAdmin, async (req, res) => {
 	const book = new Book({
 		title: req.body.title,
 		author: req.body.author,
@@ -64,7 +64,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Render edit book form
-router.get('/:id/edit', authMiddleware, async (req, res) => {
+router.get('/:id/edit', authAdmin, async (req, res) => {
 	try {
 	  const book = await Book.findById(req.params.id);
 	  const authors = await Author.find();
@@ -78,7 +78,7 @@ router.get('/:id/edit', authMiddleware, async (req, res) => {
 });
 
 // Handle book update
-router.put('/:id', authMiddleware, async (req, res) => {
+router.put('/:id', authAdmin, async (req, res) => {
 	let book;
 	try {
 	  book = await Book.findById(req.params.id);
@@ -126,15 +126,17 @@ router.put('/:id', authMiddleware, async (req, res) => {
 });
 
 // Delete books (protected route)
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', authAdmin, async (req, res) => {
 	try {
-	  await Books.findByIdAndDelete(req.params.id);
-	  res.redirect('/books');
+	// ✅ ПРАВИЛНО: Използваме "Book"
+ 	   await Book.findByIdAndDelete(req.params.id);
+ 	   res.redirect('/books');
 	}
 	catch (err) {
-	  console.error(err);
-	  res.redirect('/books');
+ 	   console.error(err);
+ 	   res.redirect('/books');
 	}
 });
+
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Author = require('../../models/Author');
-const authMiddleware = require('../../middleware/authMiddleware');
+const { authAdmin } = require('../../middleware/authMiddleware');
 const Book = require('../../models/Book');
 
 // Render author list
@@ -16,12 +16,12 @@ router.get('/', async (req, res) => {
 });
 
 // Render new author form
-router.get('/new', authMiddleware, (req, res) => {
+router.get('/new', authAdmin, (req, res) => {
 	res.render('authors/new', { author: new Author() });
 });
 
 // Create author (SSR form submission)
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authAdmin, async (req, res) => {
 	const author = new Author({
 		name: req.body.name,
 		bio: req.body.bio,
@@ -78,7 +78,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Render edit author form
-router.get('/:id/edit', authMiddleware, async (req, res) => {
+router.get('/:id/edit', authAdmin, async (req, res) => {
 	try {
 		const author = await Author.findById(req.params.id);
 		if (!author) {
@@ -92,7 +92,7 @@ router.get('/:id/edit', authMiddleware, async (req, res) => {
 });
 
 // Handle author update
-router.put('/:id', authMiddleware, async (req, res) => {
+router.put('/:id', authAdmin, async (req, res) => {
 	let author;
 	try {
 		author = await Author.findById(req.params.id);
@@ -118,7 +118,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
 });
 
 // Delete author (protected route)
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', authAdmin, async (req, res) => {
 	try {
 	  await Author.findByIdAndDelete(req.params.id);
 	  res.redirect('/authors');

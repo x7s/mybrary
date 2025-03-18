@@ -4,14 +4,14 @@
   <%- include('../partials/header') %>
 </head>
 <body>
-  <h1>Edit Book</h1>
+  <h1>Редактиране на книга</h1>
   <form action="/books/<%= book.id %>?_method=PUT" method="POST">
     <div class="form-row">
-      <label for="title">Title:</label>
+      <label for="title">Заглавие:</label>
       <input type="text" id="title" name="title" value="<%= book.title %>" required>
     </div>
     <div class="form-row">
-      <label for="author">Author:</label>
+      <label for="author">Автор:</label>
       <select id="author" name="author" required>
         <% authors.forEach(author => { %>
           <option value="<%= author._id %>" <%= author._id.equals(book.author) ? 'selected' : '' %>>
@@ -21,7 +21,7 @@
       </select>
     </div>
     <div class="form-row">
-      <label for="publisher">Publisher:</label>
+      <label for="publisher">Потребител:</label>
       <select id="publisher" name="publisher" required>
         <% publishers.forEach(publisher => { %>
           <option value="<%= publisher._id %>" <%= publisher._id.equals(book.publisher) ? 'selected' : '' %>>
@@ -31,24 +31,24 @@
       </select>
     </div>
     <div class="form-row">
-      <label for="publishYear">Publish Year:</label>
+      <label for="publishYear">Дата на актуализация:</label>
       <input type="date" id="publishYear" name="publishYear" value="<%= book.publishYear %>" required>
     </div>
     <div class="form-row">
-      <label for="publishDate">Publish Date:</label>
+      <label for="publishDate">Дата на публикуване:</label>
       <input type="date" id="publishDate" name="publishDate" value="<%= book.publishDate.toISOString().split('T')[0] %>" required>
     </div>
     <div class="form-row">
-      <label for="pageCount">Page Count:</label>
+      <label for="pageCount">Брой страници:</label>
       <input type="number" id="pageCount" name="pageCount" value="<%= book.pageCount %>" required>
     </div>
     <div class="form-row">
-      <label for="description">Description:</label>
+      <label for="description">Описание:</label>
       <textarea id="description" name="description"><%= book.description %></textarea>
     </div>
     <div class="form-row form-row-end btn-row">
-      <a class="btn btn-danger" href="/books/<%= book.id %>">Cancel</a>
-      <button class="btn btn-primary" type="submit">Update Book</button>
+      <a class="btn btn-danger" href="/books/<%= book.id %>">Отказ</a>
+      <button class="btn btn-primary" type="submit">Актуализация на книгата</button>
     </div>
   </form>
   <%- include('../partials/footer') %>

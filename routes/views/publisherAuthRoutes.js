@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Publisher = require('../../models/Publisher');
-const authMiddleware = require('../../middleware/authMiddleware');
+const { authAdmin } = require('../../middleware/authMiddleware');
 
 // Render publisher registration form
 router.get('/register', (req, res) => {
@@ -79,7 +79,7 @@ router.get('/dashboard', (req, res) => {
 });
 
 // Render publisher edit form (publisher only)
-router.get('/edit', authMiddleware, async (req, res) => {
+router.get('/edit', authAdmin, async (req, res) => {
 	try {
 	  const publisher = await Publisher.findById(req.session.publisher._id);
 	  if (!publisher) {
@@ -94,7 +94,7 @@ router.get('/edit', authMiddleware, async (req, res) => {
 });
 
 // Handle publisher update (publisher only)
-router.put('/edit', authMiddleware, async (req, res) => {
+router.put('/edit', authAdmin, async (req, res) => {
 	let publisher;
 	try {
 	  publisher = await Publisher.findById(req.session.publisher._id);
@@ -105,7 +105,8 @@ router.put('/edit', authMiddleware, async (req, res) => {
 	  publisher.username = req.body.username;
 	  publisher.bio = req.body.bio;
 	  if (req.body.password) {
-			publisher.password = req.body.password; // Password will be hashed by the pre-save hook
+		// Password will be hashed by the pre-save hook
+			publisher.password = req.body.password;
 	  }
 	  await publisher.save();
 	  res.redirect('/publishers/dashboard');
