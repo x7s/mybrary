@@ -30,16 +30,16 @@ app.use(express.urlencoded({ extended: true }));
 // Configure express-session
 app.use(
 	session({
-		secret: process.env.SESSION_SECRET || 'your-secret-key', // Use environment variable or fallback
+		secret: process.env.SESSION_SECRET || 'your-secret-key',
 		resave: false,
 		saveUninitialized: false,
-		cookie: { secure: false }, // Set to true if using HTTPS
+		cookie: { secure: false },
 	}),
 );
 
 // Middleware to pass session data to all views
 app.use((req, res, next) => {
-	res.locals.session = req.session; // Make session available in all views
+	res.locals.session = req.session;
 	next();
 });
 // For API
