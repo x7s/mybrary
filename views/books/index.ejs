@@ -7,7 +7,7 @@
   <h1>Книги</h1>
   <!-- <a href="/books/new">New Book</a> -->
   <!-- Show new book button only for admin -->
-  <% if (req.session.admin) { %>
+  <% if (session.admin) { %>
     <div>
       <a href="/books/new" class="btn btn-primary">Нова Книга</a>
     </div>

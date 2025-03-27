@@ -21,8 +21,8 @@ router.post('/login', async (req, res) => {
 		if (!isMatch) {
 			return res.status(400).render('admin/login', { errorMessage: 'Invalid username or password' });
 		}
-		// Set session for the authenticated admin
-		req.session.admin = admin;
+		// Store only necessary information in the session
+		req.session.admin = { id: admin._id, username: admin.username };
 		res.redirect('/admin/dashboard');
 	}
 	catch (err) {

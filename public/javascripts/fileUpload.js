@@ -45,7 +45,6 @@ function ready() {
     styleButtonProcessItemPosition: 'right bottom',
   }
 );*/
-
 	FilePond.setOptions({
 		labelIdle: 'Плъзнете и пуснете вашата снимка или <span class="filepond--label-action">прегледайте</span>',
 		stylePanelAspectRatio: 1 / coverAspectRatio,
