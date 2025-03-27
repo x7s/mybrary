@@ -2,6 +2,7 @@ const express = require('express');
 const methodOverride = require('method-override');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+const fileUpload = require('express-fileupload');
 const path = require('path');
 const session = require('express-session');
 const Book = require('./models/Book');
@@ -25,11 +26,28 @@ const publisherAuthRoutes = require('./routes/views/publisherAuthRoutes');
 
 dotenv.config();
 
+// Ensure SESSION_SECRET is set in production
+if (!process.env.SESSION_SECRET && process.env.NODE_ENV === 'production') {
+	throw new Error('SESSION_SECRET must be set in production!');
+}
+
 const app = express();
 
 // Security middleware
-app.use(helmet());
+app.use(
+	helmet({
+		// Disable CSP if not configured
+		contentSecurityPolicy: false,
+		// Adjust for compatibility with certain libraries
+		crossOriginEmbedderPolicy: false,
+	}),
+);
 app.use(cors());
+
+// Enable file uploads
+app.use(fileUpload());
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Connect to the database
 connectDB();
@@ -44,11 +62,11 @@ app.use(
 		resave: false,
 		saveUninitialized: false,
 		cookie: {
-			// Работи само с HTTPS в production
+			// HTTPS only in production
 			secure: process.env.NODE_ENV === 'production',
-			// Предпазва от XSS атаки
+			// Prevent XSS attacks
 			httpOnly: true,
-			// Защита срещу CSRF атаки
+			// Protect against CSRF attacks
 			sameSite: 'strict',
 		},
 	}),
@@ -57,10 +75,11 @@ app.use(
 
 // Middleware to pass session data to all views
 app.use((req, res, next) => {
+	console.log('Admin session:', req.session.admin);
 	res.locals.session = req.session;
 	next();
 });
-// Middleware за глобална обработка на грешки
+// Global error handling middleware
 app.use(errorHandler);
 
 // For API
@@ -73,20 +92,32 @@ app.use(methodOverride('_method'));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Static files with caching
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
 
 // Rate limiting middleware
 const apiLimiter = rateLimit({
-	// 15 минути
+	// 15 minutes
 	windowMs: 15 * 60 * 1000,
-	// Макс 100 заявки на IP
+	// Max 100 requests per IP
 	max: 100,
 	message: { error: 'Too many requests, please try again later.' },
 });
 
-// Приложи rate-limiting към всички API маршрути
+const authorLimiter = rateLimit({
+	// 15 minutes
+	windowMs: 15 * 60 * 1000,
+	// Lower limit for author-related routes
+	max: 50,
+	message: { error: 'Too many requests to authors, please try again later.' },
+});
+
+// Apply rate-limiting to specific routes
 app.use('/api/', apiLimiter);
+app.use('/api/authors', authorLimiter);
+app.use('/api/books', apiLimiter);
+app.use('/api/publishers', apiLimiter);
+
 // API Routes
 app.use('/api/authors', apiAuthorRoutes);
 app.use('/api/books', apiBookRoutes);
@@ -94,8 +125,8 @@ app.use('/api/publishers', apiPublisherRoutes);
 
 // View Routes
 app.use('/admin', adminRoutes);
-app.use('/authors', viewAuthorRoutes);
 app.use('/books', viewBookRoutes);
+app.use('/authors', viewAuthorRoutes);
 app.use('/publishers', publisherRoutes);
 app.use('/', loginRoutes);
 app.use('/publishers', publisherAuthRoutes);
@@ -104,20 +135,32 @@ app.use('/publishers', publisherAuthRoutes);
 app.get('/', async (req, res) => {
 	try {
 		const books = await Book.find()
-			.populate('author')
-			.populate('publisher')
+			// Fetch only necessary fields
+			.select('title author publisher createdAt')
+			// Fetch only the author's name
+			.populate('author', 'name')
+			// Fetch only the publisher's name
+			.populate('publisher', 'name')
 			.limit(10)
 			.sort({ createdAt: -1 });
 		res.render('index', { books });
 	}
 	catch (error) {
-		console.error(error);
-		res.status(500).send('Server Error');
+		console.error('Error fetching books:', error.message);
+		res.status(500).render('error', { message: 'An error occurred while loading the homepage.' });
 	}
 });
 
 // Start the server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`);
+});
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+	server.close(() => {
+		console.log('Server shut down gracefully.');
+		process.exit(0);
+	});
 });
