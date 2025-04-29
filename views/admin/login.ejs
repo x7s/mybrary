@@ -4,21 +4,29 @@
   <%- include('../partials/header') %>
   <title>Вход на администратор</title>
 </head>
-<body>
-  <h1>Вход на администратор</h1>
-  <form action="/admin/login" method="POST">
-    <div class="form-row">
-      <label for="username">Потребителско Име:</label>
-      <input type="text" id="username" name="username" required>
+<body class="img js-fullheight" style="background-image: url(https://preview.colorlib.com/theme/bootstrap/login-form-20/images/bg.jpg.webp)"; height: 470px;>
+  <div class="wrapper" style="max-width: 350px; min-height: 500px; margin: 80px auto; padding: 40px 30px 30px 30px; background-color: #d3ecff; border-radius: 15px; box-shadow: 13px 13px 20px #cbced1, -13px -13px 20px #fff;">
+    <div class="logo">
+        <img src="https://uiparadox.co.uk/templates/book_store/v3/assets/media/slider-2/Phil-main.png" alt="">
     </div>
-    <div class="form-row">
-      <label for="password">Парола:</label>
-      <input type="password" id="password" name="password" required>
+    <div class="text-center mt-4 name">
+      Вход на администратор
     </div>
-    <div class="form-row form-row-end btn-row">
-      <button class="btn btn-primary" type="submit">Вход</button>
+    <form action="/admin/login" method="POST" class="p-3 mt-3">
+        <div class="form-field d-flex align-items-center">
+            <span class="far fa-user"></span>
+            <input type="text" id="username" placeholder="Username" autocomplete="off" name="username" required>
+        </div>
+        <div class="form-field d-flex align-items-center">
+            <span class="fas fa-key"></span>
+            <input type="password" id="password" placeholder="Password" autocomplete="off" name="password" required>
+        </div>
+        <button class="btn btn-primary mt-3" type="submit">Вход</button>
+    </form>
+    <div class="text-center fs-6">
+        <a href="#">Forget password?</a> or <a href="#">Sign up</a>
     </div>
-  </form>
+</div>
   <%- include('../partials/footer') %>
 </body>
 </html>

@@ -3,26 +3,281 @@
 <head>
   <%- include('../partials/header') %>
   <title><%= book.title %></title>
+  <link rel="stylesheet" href="/css/books.css">
 </head>
 <body>
-  <h1><%= book.title %></h1>
-  <p>Автор: <%= book.author.name %></p>
-  <p>Потребител: <%= book.publisher.name %></p>
-  <p>Публикувано на: <%= book.publishDate.toDateString() %></p>
-  <p>Брой страници: <%= book.pageCount %></p>
-  <p>Описание: <%= book.description %></p>
-
-  <!-- Show edit and delete buttons only for admin -->
-  <% if (session.admin) { %>
-    <div>
-      <a href="/books" class="btn btn-danger">Всички Книги</a>
-      <a href="/books/<%= book.id %>/edit" class="btn btn-primary">Редактиране</a>
-      <form action="/books/<%= book.id %>?_method=DELETE" method="POST" style="display: inline;">
-        <button type="submit" class="btn btn-danger">Изтриване</button>
-      </form>
+  <div class="row">
+    <div class="col-xs-12 col-sm-3 col-md-3 bs-region bs-region--middle-genres">
+      <section class="views-element-container block block-views block-views-blockeb-genres-eb-genres-block clearfix">
+        <div class="block-header">
+          <h2 class="block-title">eBook Deals</h2>
+        </div>
+        <div class="block-content">
+          <div class="form-group">
+            <div class="ebook-feature--genres view view-eb-genres view-id-eb_genres view-display-id-eb_genres_block js-view-dom-id-19b07bddfefb9ca6f1e9a5f5e91878edca93bd014bf32be3617014b7091c06dc">
+              <div class="view-content">
+                <div class="views-row">
+                  <div class="views-field views-field-name">
+                    <span class="field-content">
+                      <a href="/genres/action-adventure" hreflang="en">Action &amp; Adventure</a>
+                    </span>
+                  </div>
+                </div>
+                <div class="views-row">
+                  <div class="views-field views-field-name">
+                    <span class="field-content">
+                      <a href="/genres/biographies-history" hreflang="en">Biographies &amp; History</a>
+                    </span>
+                  </div>
+                </div>
+                <div class="views-row">
+                  <div class="views-field views-field-name">
+                    <span class="field-content">
+                      <a href="/genres/childrens" hreflang="en">Children's</a>
+                    </span>
+                  </div>
+                </div>
+                <div class="views-row">
+                  <div class="views-field views-field-name">
+                    <span class="field-content">
+                      <a href="/genres/cooking-health" hreflang="en">Cooking &amp; Health</a>
+                    </span>
+                  </div>
+                </div>
+                <div class="views-row">
+                  <div class="views-field views-field-name">
+                    <span class="field-content">
+                      <a href="/genres/fantasy" hreflang="en">Fantasy</a>
+                    </span>
+                  </div>
+                </div>
+                <div class="views-row">
+                  <div class="views-field views-field-name">
+                    <span class="field-content">
+                      <a href="/genres/historical-fiction" hreflang="en">Historical Fiction</a>
+                    </span>
+                  </div>
+                </div>
+                <div class="views-row">
+                  <div class="views-field views-field-name">
+                    <span class="field-content">
+                      <a href="/genres/horror" hreflang="en">Horror</a>
+                    </span>
+                  </div>
+                </div>
+                <div class="views-row">
+                  <div class="views-field views-field-name">
+                    <span class="field-content">
+                      <a href="/genres/literary_fiction" hreflang="en">Literary Fiction</a>
+                    </span>
+                  </div>
+                </div>
+                <div class="views-row">
+                  <div class="views-field views-field-name">
+                    <span class="field-content">
+                      <a href="/genres/mystery-thriller" hreflang="en">Mystery &amp; Thriller</a>
+                    </span>
+                  </div>
+                </div>
+                <div class="views-row">
+                  <div class="views-field views-field-name">
+                    <span class="field-content">
+                      <a href="/genres/non-fiction" hreflang="en">Non-Fiction</a>
+                    </span>
+                  </div>
+                </div>
+                <div class="views-row">
+                  <div class="views-field views-field-name">
+                    <span class="field-content">
+                      <a href="/genres/paranormal" hreflang="en">Paranormal</a>
+                    </span>
+                  </div>
+                </div>
+                <div class="views-row">
+                  <div class="views-field views-field-name">
+                    <span class="field-content">
+                      <a href="/genres/romance" hreflang="en">Romance</a>
+                    </span>
+                  </div>
+                </div>
+                <div class="views-row">
+                  <div class="views-field views-field-name">
+                    <span class="field-content">
+                      <a href="/genres/science-fiction" hreflang="en">Science Fiction</a>
+                    </span>
+                  </div>
+                </div>
+                <div class="views-row">
+                  <div class="views-field views-field-name">
+                    <span class="field-content">
+                      <a href="/genres/teen-young-adult" hreflang="en">Teen &amp; Young Adult</a>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
-  <% } %>
-
-  <%- include('../partials/footer') %>
+    <div class="col-9 col-sm-9 col-xs-12 bs-region bs-region--content">
+      <div class="row">
+        <div class="col-xs-12 col-sm-3 bs-region bs-region--middle-cover">
+          <section class="block block-layout-builder block-field-blocknodeebook-featurefield-ef-cover clearfix">
+            <div class="block-header"></div>
+            <div class="block-content">
+              <div class="field field--name-field-ef-cover field--type-entity-reference field--label-hidden field--item">
+                <% 
+                // Determine the correct image URL
+                let coverUrl;
+                if (book.coverImageUrl) {
+                  coverUrl = book.coverImageUrl;
+                }
+                else if (book.coverImagePath) {
+                  // Handle both full paths and filenames
+                  coverUrl = book.coverImagePath.includes('uploads/') ? book.coverImagePath : `/uploads/covers/${book.coverImagePath}`;
+                }
+                %>
+                <% if (coverUrl) { %>
+                  <img loading="lazy" src="<%= coverUrl %>" alt="<%= book.title %>" class="book-cover img-responsive" width="206" height="330" alt="icehouse" typeof="foaf:Image" onerror="this.onerror=null;this.src='/uploads/default-cover.png';this.classList.add('broken-image')">
+                  <% } else { %>
+                    <div class="book-cover-placeholder">Все още няма корица</div>
+                    <% } %>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div class="col-9 col-sm-9 col-xs-12 bs-region bs-region--content">
+          <div class="row">
+            <section class="block block-layout-builder block-field-blocknodeebook-featuretitle clearfix">
+              <div class="block-header">
+                <h2><%= book.title %></h2>
+              </div>
+            </section>
+            <section class="block block-layout-builder block-field-blocknodeebook-featurefield-af-name clearfix">
+              <div class="block-header"></div>
+              <div class="block-content">
+                <div class="field field--name-field-af-name field--type-string field--label-hidden field--item">
+                  <% if (book.author) { %>
+                    <p class="book-author">от: <%= book.author.name %></p>
+                    <% } else { %>
+                      <p class="book-author">от: Неизвестен Автор</p>
+                      <% } %>
+                </div>
+              </div>
+            </section>
+            <section class="block block-layout-builder block-field-blocknodeebook-featurebody clearfix">
+              <div class="block-header"></div>
+              <div class="block-content">
+                <div class="field field--name-body field--type-text-with-summary field--label-hidden field--item">Описание:<%= book.description %></div>
+              </div>
+            </section>
+            <section class="block block-layout-builder block-field-blocknodeebook-featurefield-eb-genre clearfix">
+              <div class="block-header"></div>
+              <div class="block-content">
+                <div class="field field--name-field-eb-genre field--type-entity-reference field--label-hidden field--item">
+                  <a href="/genres/mystery-thriller" hreflang="en">Mystery &amp; Thriller</a>
+                </div>
+              </div>
+            </section>
+          </div>
+          <div class="row">
+            <section class="block block-layout-builder block-field-blocknodeebook-featurefield-ef-price clearfix">
+              <div class="block-header"></div>
+              <div class="block-content">
+                <div class="field field--name-field-ef-price field--type-decimal field--label-hidden field--item">Публикувано на: <%= book.publishDate.toDateString() %></div>
+              </div>
+            </section>
+            <section class="block block-layout-builder block-field-blocknodeebook-featurefield-ef-price-retail clearfix">
+              <div class="block-header"></div>
+              <div class="block-content">
+                <div class="field field--name-field-ef-price-retail field--type-decimal field--label-hidden field--item">Брой страници: <%= book.pageCount %></div>
+              </div>
+            </section>
+          </div>
+          <div class="row ebook-feature--links">
+            <section class="block block-layout-builder block-field-blocknodeebook-featurefield-ef-amazon-url clearfix">
+              <div class="block-header"></div>
+              <div class="block-content">
+                <div class="field field--name-field-ef-amazon-url field--type-link field--label-hidden field--item">
+                  <a href="#" rel="nofollow" target="_self">
+                    <% if (book.publisher) { %>
+                      <p class="book-publisher">Публикувано от: <%= book.publisher.name %></p>
+                      <% } else { %>
+                        <p class="book-publisher">Публикувано от: Неизвестен Потребител</p>
+                        <% } %>
+                  </a>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+      <div class="row ebook-feature--author_bio">
+        <div class="col-xs-12 col-sm-9 bs-region bs-region--author-bio">
+          <section class="block block-layout-builder block-field-blocknodeebook-featurefield-af-bio clearfix">
+            <div class="block-header">
+              <h2 class="block-title">Автор: <%= book.author.name %></h2>
+            </div>
+            <div class="block-content">
+              <div class="field field--name-field-af-bio field--type-text-long field--label-hidden field--item">
+                <p><%= book.author.bio %></p>
+                <% if (session.admin) { %>
+                  <div>
+                    <a href="/books" class="btn btn-danger">Всички Книги</a>
+                    <a href="/books/<%= book.id %>/edit" class="btn btn-primary">Редактиране</a>
+                    <form action="/books/<%= book.id %>?_method=DELETE" method="POST" style="display: inline;">
+                      <button type="submit" class="btn btn-danger">Изтриване</button>
+                    </form>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+          </section>
+          <div class="ebook-feature--author-links">
+            <h3>Книги от този Автор</h3>
+            <section class="block block-layout-builder block-field-blocknodeebook-featurefield-af-url-website clearfix">
+              <div class="block-header"></div>
+              <div class="block-content">
+                <div class="field field--name-field-af-url-website field--type-link field--label-hidden field--item">
+                  <li>
+                    <a href="#"><%= book.title %></a>
+                    <span> от <%= book.author.name %></span>
+                  </li>
+                </div>
+              </div>
+            </section>
+            <section class="block block-layout-builder block-field-blocknodeebook-featurefield-af-url-goodreads clearfix">
+              <div class="block-header"></div>
+              <div class="block-content">
+                <div class="field field--name-field-af-url-goodreads field--type-link field--label-hidden field--item">
+                  <a href="#" rel="nofollow" target="_blank">Goodreads</a>
+                </div>
+              </div>
+            </section>
+            <section class="block block-layout-builder block-field-blocknodeebook-featurefield-af-url-amazon clearfix">
+              <div class="block-header"></div>
+              <div class="block-content">
+                <div class="field field--name-field-af-url-amazon field--type-link field--label-hidden field--item">
+                  <a href="#" rel="nofollow" target="_blank">Amazon</a>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+        <div class="col-xs-12 col-sm-3 bs-region bs-region--author-photo">
+          <section class="block block-layout-builder block-field-blocknodeebook-featurefield-af-photo clearfix">
+            <div class="block-header"></div>
+            <div class="block-content">
+              <div class="field field--name-field-af-photo field--type-entity-reference field--label-hidden field--item">
+                <img loading="lazy" src="#" width="220" height="330" alt="Author Avatar" typeof="foaf:Image" class="img-responsive">
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
+<%- include('../partials/footer') %>
 </html>

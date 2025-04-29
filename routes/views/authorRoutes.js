@@ -3,23 +3,35 @@ const router = express.Router();
 const Author = require('../../models/Author');
 const { authAdmin } = require('../../middleware/authMiddleware');
 const Book = require('../../models/Book');
-
-// Render author list
+// Render author list with pagination
 router.get('/', async (req, res) => {
 	try {
-		const authors = await Author.find();
-		res.render('authors/index', { authors, req });
+	  const page = parseInt(req.query.page) || 1;
+	  const limit = parseInt(req.query.limit) || 10;
+	  const skip = (page - 1) * limit;
+	  const totalAuthors = await Author.countDocuments();
+	  const totalPages = Math.ceil(totalAuthors / limit);
+	  const authors = await Author.find()
+	  		.sort({ name: 1 })
+			.skip(skip)
+			.limit(limit);
+	  res.render('authors/index', {
+			authors,
+			currentPage: page,
+			totalPages,
+			perPage: limit,
+			req,
+	  });
 	}
-	catch {
-		res.redirect('/');
+	catch (err) {
+	  console.error(err);
+	  res.redirect('/');
 	}
 });
-
 // Render new author form
 router.get('/new', authAdmin, (req, res) => {
 	res.render('authors/new', { author: new Author() });
 });
-
 // Create author (SSR form submission)
 router.post('/', authAdmin, async (req, res) => {
 	const author = new Author({
@@ -37,27 +49,6 @@ router.post('/', authAdmin, async (req, res) => {
 		});
 	}
 });
-
-// Show author details with books
-/*
-router.get('/:id', async (req, res) => {
-	try {
-		const author = await Author.findById(req.params.id);
-		if (!author) {
-			return res.redirect('/authors');
-		}
-
-		// Fetch books written by this author
-		const books = await Book.find({ author: author.id }).populate('publisher');
-
-		// Pass books to the template
-		res.render('authors/show', { author, books });
-	}
-	catch (error) {
-		console.error(error);
-		res.redirect('/authors');
-	}
-}); */
 // Show author details with books
 router.get('/:id', async (req, res) => {
 	try {
@@ -65,10 +56,7 @@ router.get('/:id', async (req, res) => {
 	  if (!author) {
 			return res.redirect('/authors');
 	  }
-
-	  // Fetch books written by this author
 	  const books = await Book.find({ author: author.id }).populate('publisher');
-
 	  res.render('authors/show', { author, books, req });
 	}
 	catch (error) {
@@ -76,7 +64,6 @@ router.get('/:id', async (req, res) => {
 	  res.redirect('/authors');
 	}
 });
-
 // Render edit author form
 router.get('/:id/edit', authAdmin, async (req, res) => {
 	try {
@@ -90,7 +77,6 @@ router.get('/:id/edit', authAdmin, async (req, res) => {
 		res.redirect('/authors');
 	}
 });
-
 // Handle author update
 router.put('/:id', authAdmin, async (req, res) => {
 	let author;
@@ -116,7 +102,6 @@ router.put('/:id', authAdmin, async (req, res) => {
 		}
 	}
 });
-
 // Delete author (protected route)
 router.delete('/:id', authAdmin, async (req, res) => {
 	try {

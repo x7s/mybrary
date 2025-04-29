@@ -2,23 +2,153 @@
 <html lang="bg">
 <head>
   <%- include('../partials/header') %>
-  <title><%= publisher.name %></title>
+  <title><%= publisher.name %> | Профил на издател</title>
+  <style>
+    .profile-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    .profile-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #f8f9fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 2rem;
+      font-size: 3rem;
+      color: #6c757d;
+    }
+    .profile-bio {
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+    .profile-details {
+      margin-bottom: 2rem;
+    }
+    .detail-item {
+      margin-bottom: 0.5rem;
+    }
+    .detail-item i {
+      width: 24px;
+      text-align: center;
+      margin-right: 0.5rem;
+      color: #6c757d;
+    }
+  </style>
 </head>
 <body>
-  <h1><%= publisher.name %></h1>
-  <p><%= publisher.bio %></p>
+  <main class="container py-4">
+    <div class="profile-container">
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <img src="<%= publisher.avatar %>" alt="<%= publisher.name %>" 
+               class="img-fluid rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+        </div>
+        <div>
+          <h1><%= publisher.name %></h1>
+          <% if (publisher.website) { %>
+            <a href="<%= publisher.website %>" target="_blank" class="text-decoration-none">
+              <i class="bi bi-globe"></i> Посети уебсайт
+            </a>
+          <% } %>
+        </div>
+      </div>
 
-  <!-- Show edit and delete buttons only for admin -->
-  <% if (session.admin) { %>
-    <div>
-      <a href="/admin/publishers/<%= publisher.id %>/edit" class="btn btn-primary">Edit</a>
-      <form action="/admin/publishers/<%= publisher.id %>?_method=DELETE" method="POST" style="display: inline;">
-        <button type="submit" class="btn btn-danger">Delete</button>
-      </form>
+      <% if (publisher.bio) { %>
+        <div class="profile-bio">
+          <h3>За издателя</h3>
+          <p><%= publisher.bio %></p>
+        </div>
+      <% } %>
+
+      <div class="profile-details">
+        <h3>Контакти</h3>
+        <% if (publisher.email) { %>
+          <div class="detail-item">
+            <i class="bi bi-envelope"></i>
+            <a href="mailto:<%= publisher.email %>"><%= publisher.email %></a>
+          </div>
+        <% } %>
+        <% if (publisher.phone) { %>
+          <div class="detail-item">
+            <i class="bi bi-telephone"></i>
+            <a href="tel:<%= publisher.phone %>"><%= publisher.phone %></a>
+          </div>
+        <% } %>
+        <% if (publisher.address && (publisher.address.street || publisher.address.city)) { %>
+          <div class="detail-item">
+            <i class="bi bi-geo-alt"></i>
+            <%= [publisher.address.street, publisher.address.city, publisher.address.postalCode].filter(Boolean).join(', ') %>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Admin actions -->
+      <% if (session.admin) { %>
+        <div class="admin-actions mt-4 pt-3 border-top">
+          <h4>Административни действия</h4>
+          <div class="d-flex gap-2">
+            <a href="/admin/publishers/<%= publisher._id %>/edit" class="btn btn-primary">
+              <i class="bi bi-pencil"></i> Редактирай
+            </a>
+            <button onclick="confirmDelete('<%= publisher._id %>')" class="btn btn-danger">
+              <i class="bi bi-trash"></i> Изтрий
+            </button>
+          </div>
+        </div>
+      <% } %>
+
+      <div class="mt-4">
+        <a href="/publishers" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left"></i> Назад към издателите
+        </a>
+      </div>
     </div>
-  <% } %>
+  </main>
 
-  <a href="/publishers">Back to Publishers</a>
   <%- include('../partials/footer') %>
+
+  <!-- SweetAlert for delete confirmation -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    function confirmDelete(publisherId) {
+      Swal.fire({
+        title: 'Сигурни ли сте?',
+        text: "Това действие не може да бъде отменено!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Да, изтрий!',
+        cancelButtonText: 'Отказ'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          fetch(`/admin/publishers/${publisherId}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          }).then(response => {
+            if (response.ok) {
+              window.location.href = '/admin/publishers';
+            } else {
+              Swal.fire('Грешка!', 'Неуспешно изтриване', 'error');
+            }
+          });
+        }
+      });
+    }
+  </script>
 </body>
 </html>

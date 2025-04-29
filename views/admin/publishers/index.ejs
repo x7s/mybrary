@@ -2,21 +2,146 @@
 <html lang="bg">
 <head>
   <%- include('../../partials/header') %>
-  <title>Admin - Publishers</title>
+  <!-- Load jQuery first -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Then load DataTables CSS and JS -->
+  <link href="https://cdn.datatables.net/v/bs5/dt-2.0.7/datatables.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <title>Admin - Потребители</title>
+  <style>
+    .action-buttons .btn {
+      margin-right: 5px;
+    }
+    .table-responsive {
+      overflow-x: auto;
+    }
+  </style>
 </head>
 <body>
-  <h1>Publishers</h1>
-  <ul>
-    <% publishers.forEach(publisher => { %>
-      <li>
-        <a href="/admin/publishers/<%= publisher.id %>/edit"><%= publisher.name %></a>
-        <form action="/admin/publishers/<%= publisher.id %>?_method=DELETE" method="POST" style="display: inline;">
-          <button type="submit" class="btn btn-danger">Delete</button>
-        </form>
-      </li>
-    <% }) %>
-  </ul>
-  <a href="/admin/dashboard">Back to Dashboard</a>
+  <main class="main-content container-fluid">
+    <div class="row mb-4">
+      <div class="col-12">
+        <h1 class="page-header p-3 text-center">Админ - Потребители
+          <a href="/publishers/new" class="btn btn-primary ms-3">
+            <i class="bi bi-plus-lg"></i> Нов Потребител
+          </a>
+          <a href="/admin/dashboard" class="btn btn-secondary ms-2">
+            <i class="bi bi-speedometer2"></i> Админ панел
+          </a>
+        </h1>
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Списък с Потребители</h5>
+        <div class="d-flex">
+          <select id="perPage" class="form-select form-select-sm me-2" style="width: auto;">
+            <option value="10" <%= perPage == 10 ? 'selected' : '' %>>10 на страница</option>
+            <option value="20" <%= perPage == 20 ? 'selected' : '' %>>20 на страница</option>
+            <option value="50" <%= perPage == 50 ? 'selected' : '' %>>50 на страница</option>
+            <option value="100" <%= perPage == 100 ? 'selected' : '' %>>100 на страница</option>
+          </select>
+          <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Търси потребител..." style="width: auto;">
+        </div>
+      </div>
+      
+      <div class="card-body">
+        <div class="table-responsive">
+          <table id="publishersTable" class="table table-striped table-hover">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Име</th>
+                <th scope="col">Потребителско Име</th>
+                <th scope="col">Био</th>
+                <th scope="col">Действия</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% publishers.forEach((publisher, index) => { %>
+                <tr>
+                  <th scope="row"><%= (currentPage - 1) * perPage + index + 1 %></th>
+                  <td><%= publisher.name %></td>
+                  <td><%= publisher.username %></td>
+                  <td><%= publisher.bio?.substring(0, 50) || 'Няма Биография' %>...</td>
+                  <td class="action-buttons">
+                    <a href="/publishers/<%= publisher._id %>" class="btn btn-sm btn-outline-primary me-1">
+                      <i class="bi bi-eye"></i> Виж
+                    </a>
+                    <a href="/admin/publishers/<%= publisher._id %>/edit" class="btn btn-sm btn-outline-primary">
+                      <i class="bi bi-pencil"></i> Редактирай
+                    </a>
+                    <form action="/admin/publishers/<%= publisher._id %>?_method=DELETE" method="POST" style="display: inline;">
+                      <button onclick="confirmDelete('<%= publisher._id %>')" 
+                        class="btn btn-danger">
+                  <i class="bi bi-trash"></i> Изтрий
+                </button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div class="card-footer">
+        <nav aria-label="Publishers pagination">
+          <ul class="pagination justify-content-center mb-0">
+            <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+              <a class="page-link" href="?page=<%= currentPage - 1 %>&limit=<%= perPage %>" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            
+            <% for (let i = 1; i <= totalPages; i++) { %>
+              <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                <a class="page-link" href="?page=<%= i %>&limit=<%= perPage %>"><%= i %></a>
+              </li>
+            <% } %>
+            
+            <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+              <a class="page-link" href="?page=<%= currentPage + 1 %>&limit=<%= perPage %>" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </main>
+
   <%- include('../../partials/footer') %>
+  
+  <!-- Make sure jQuery is loaded before DataTables -->
+  <script src="https://cdn.datatables.net/v/bs5/dt-2.0.7/datatables.min.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize DataTable without paging (we use server-side)
+      $('#publishersTable').DataTable({
+        paging: false,
+        searching: true,
+        info: false,
+        language: {
+          search: "Търси:",
+          zeroRecords: "Няма намерени издателства"
+        }
+      });
+      
+      // Connect search input to DataTable
+      $('#searchInput').keyup(function() {
+        $('#publishersTable').DataTable().search(this.value).draw();
+      });
+      
+      // Handle per page selection
+      $('#perPage').change(function() {
+        const limit = $(this).val();
+        window.location.href = `?page=1&limit=${limit}`;
+      });
+    });
+  </script>
 </body>
 </html>

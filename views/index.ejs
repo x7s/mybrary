@@ -4,8 +4,10 @@
   <%- include('partials/header') %>
 </head>
 <body>
-  <h2 class="page-header">Наскоро добавени</h2>
-  <%- include('partials/bookGrid', { books: books, large: true }) %>
+  <main class="main-content">
+    <h2 class="page-header p-3 text-center">Наскоро добавени</h2>
+    <%- include('partials/bookGrid', { books: books, large: true }) %>
+  </main>
   <%- include('partials/footer') %>
 </body>
 </html>

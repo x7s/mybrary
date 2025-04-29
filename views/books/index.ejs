@@ -4,22 +4,52 @@
   <%- include('../partials/header') %>
 </head>
 <body>
-  <h1>Книги</h1>
-  <!-- <a href="/books/new">New Book</a> -->
-  <!-- Show new book button only for admin -->
-  <% if (session.admin) { %>
-    <div>
-      <a href="/books/new" class="btn btn-primary">Нова Книга</a>
-    </div>
-  <% } %>
-  <ul>
+  <main class="main-content">
+  <h1 class="page-header p-3 text-center">Книги <% if (session.admin) { %>
+    <a href="/books/new" class="btn btn-primary">Нова Книга</a>
+  <% } %></h1>
+  <div class="wrapper" style="padding-left: 0px; padding-right: 0px;">
+    <div class="book-grid large">
     <% books.forEach(book => { %>
-      <li>
-        <a href="/books/<%= book.id %>"><%= book.title %></a>
-        <span> by <%= book.author.name %></span>
-      </li>
+      <div class="book-card">
+        <% 
+          // Determine the correct image URL
+          let coverUrl;
+          if (book.coverImageUrl) {
+            coverUrl = book.coverImageUrl;
+          } else if (book.coverImagePath) {
+            // Handle both full paths and filenames
+            coverUrl = book.coverImagePath.includes('uploads/') 
+              ? book.coverImagePath 
+              : `/uploads/covers/${book.coverImagePath}`;
+          }
+        %>
+        
+        <% if (coverUrl) { %>
+          <img 
+            src="<%= coverUrl %>" 
+            alt="<%= book.title %> Cover" 
+            class="book-cover"
+            onerror="this.onerror=null;this.src='/uploads/default-cover.png';this.classList.add('broken-image')"
+          >
+        <% } else { %>
+          <div class="book-cover-placeholder">Все още няма корица</div>
+        <% } %>
+  
+        <h3 class="book-title"><%= book.title %></h3>
+        
+        <% if (book.author) { %>
+          <p class="book-author">от <%= book.author.name %></p>
+        <% } else { %>
+          <p class="book-author">от Неизвестен Автор</p>
+        <% } %>
+        
+        <a href="/books/<%= book.id %>" class="btn btn-primary">Вижте подробности</a>
+      </div>
     <% }) %>
-  </ul>
+  </div>
+</div>
+</main>
   <%- include('../partials/footer') %>
 </body>
 </html>

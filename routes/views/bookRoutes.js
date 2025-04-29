@@ -4,9 +4,9 @@ const { authAdmin } = require('../../middleware/authMiddleware');
 const Book = require('../../models/Book');
 const Author = require('../../models/Author');
 const Publisher = require('../../models/Publisher');
+const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs');
-
 // Render book list
 router.get('/', async (req, res) => {
 	try {
@@ -17,12 +17,8 @@ router.get('/', async (req, res) => {
 		res.redirect('/');
 	}
 });
-
 // Render new book form
 router.get('/new', authAdmin, async (req, res) => {
-	// Debugging
-	console.log('Session:', req.session);
-	console.log('Accessing /books/new route...');
 	try {
 		const authors = await Author.find();
 		const publishers = await Publisher.find();
@@ -30,93 +26,71 @@ router.get('/new', authAdmin, async (req, res) => {
 			book: new Book(),
 			authors,
 			publishers,
-			// CSRF token for security
-			csrfToken: req.csrfToken(),
 		});
 	}
 	catch {
 		res.redirect('/books');
 	}
 });
-
-// Create book (SSR form submission)
-/*
-router.post('/', authAdmin, async (req, res) => {
-	const book = new Book({
-		title: req.body.title,
-		author: req.body.author,
-		publisher: req.body.publisher,
-		publishDate: new Date(req.body.publishDate),
-		pageCount: req.body.pageCount,
-		description: req.body.description,
-	});
-	try {
-		await book.save();
-		res.redirect(`/books/${book.id}`);
-	}
-	catch {
-		res.render('books/new', {
-			book: book,
-			errorMessage: 'Error creating Book',
-		});
-	}
-}); */
-// 📌 Route за създаване на нова книга
 router.post('/', authAdmin, async (req, res) => {
 	try {
-		if (!req.files || !req.files.coverImage) {
+	  if (!req.files?.coverImage) {
 			return res.status(400).json({ error: 'Cover image is required' });
-		}
-
-		// 📌 Взимаме файла от заявката
-		const coverImage = req.files.coverImage;
-
-		// 📌 Разширение на файла
-		const ext = path.extname(coverImage.name);
-
-		// 📌 Създаваме уникално име
-		const fileName = `${Date.now()}-${Math.round(Math.random() * 1E9)}${ext}`;
-
-		// 📌 Път за запазване
-		const uploadPath = path.join(__dirname, '../../uploads', fileName);
-
-		// 📌 Запазване на файла
-		await coverImage.mv(uploadPath);
-
-		// 📌 Създаваме новата книга
-		const book = new Book({
+	  }
+	  const coverImage = req.files.coverImage;
+	  const ext = path.extname(coverImage.name);
+	  const fileName = `book-${Date.now()}${ext}`;
+	  const uploadDir = path.join(__dirname, '../../uploads');
+	  const coversDir = path.join(uploadDir, 'covers');
+	  const thumbsDir = path.join(uploadDir, 'thumbnails');
+	  [uploadDir, coversDir, thumbsDir].forEach(dir => {
+			if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+	  });
+	  const coverPath = path.join(coversDir, fileName);
+	  const thumbPath = path.join(thumbsDir, fileName);
+	  await Promise.all([
+			coverImage.mv(coverPath),
+			sharp(coverImage.data).resize(300).toFile(thumbPath),
+	  ]);
+	  const book = new Book({
 			title: req.body.title,
 			author: req.body.author,
+			authorbio: req.body.authorbio,
 			publisher: req.body.publisher,
 			publishDate: new Date(req.body.publishDate),
 			pageCount: req.body.pageCount,
 			description: req.body.description,
-			// Запазваме само името, не целия път
-			coverImagePath: fileName,
-		});
-
-		await book.save();
-		res.redirect(`/books/${book.id}`);
+			coverImagePath: `/uploads/covers/${fileName}`,
+			thumbnailPath: `/uploads/thumbnails/${fileName}`,
+	  });
+	  await book.save();
+	  res.redirect(`/books/${book.id}`);
 	}
 	catch (err) {
-		console.error(err);
-		res.status(500).json({ error: 'Error creating book' });
+	  console.error(err);
+	  const authors = await Author.find();
+	  const publishers = await Publisher.find();
+	  res.render('books/new', {
+			book: req.body,
+			authors,
+			publishers,
+			errorMessage: 'Error creating book',
+	  });
 	}
 });
-
 // Show book details
 router.get('/:id', async (req, res) => {
 	try {
+		const books = await Book.find().populate('author');
 		const book = await Book.findById(req.params.id)
 			.populate('author')
 			.populate('publisher');
-		res.render('books/show', { book, req });
+		res.render('books/show', { book, books, req });
 	}
 	catch {
 		res.redirect('/books');
 	}
 });
-
 // Render edit book form
 router.get('/:id/edit', authAdmin, async (req, res) => {
 	try {
@@ -130,7 +104,6 @@ router.get('/:id/edit', authAdmin, async (req, res) => {
 		res.redirect('/books');
 	}
 });
-
 // Handle book update
 router.put('/:id', authAdmin, async (req, res) => {
 	let book;
@@ -149,21 +122,9 @@ router.put('/:id', authAdmin, async (req, res) => {
 	  await book.save();
 	  res.redirect(`/books/${book.id}`);
 	}
-	/* catch {
-	  if (book) {
-			res.render('books/edit', {
-		  book: book,
-		  errorMessage: 'Error updating Book',
-			});
-	  }
-	  else {
-			res.redirect('/books');
-	  }
-	}*/
 	catch (err) {
 		console.error(err);
 		if (book) {
-		  // If there's an error, re-render the edit form with the necessary data
 		  const authors = await Author.find();
 		  const publishers = await Publisher.find();
 		  res.render('books/edit', {
@@ -178,51 +139,64 @@ router.put('/:id', authAdmin, async (req, res) => {
 		}
 	  }
 });
-
-// 📌 Route за качване на файл с FilePond
 router.post('/upload', authAdmin, async (req, res) => {
 	try {
-		if (!req.files || !req.files.coverImage) {
-			return res.status(400).json({ error: 'Cover image is required' });
-		}
-
-		const coverImage = req.files.coverImage;
-		const ext = path.extname(coverImage.name);
-		const fileName = `${Date.now()}-${Math.round(Math.random() * 1E9)}${ext}`;
-		const uploadPath = path.join(__dirname, '../../uploads', fileName);
-
-		await coverImage.mv(uploadPath);
-
-		// 📌 FilePond очаква да върнем името на файла
-		res.status(200).json({ filePath: fileName });
+	  if (!req.files?.filepond) {
+			return res.status(400).json({ error: 'No file uploaded' });
+	  }
+	  const file = req.files.filepond;
+	  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+	  if (!allowedTypes.includes(file.mimetype)) {
+			return res.status(400).json({ error: 'Only JPEG, PNG or WebP images allowed' });
+	  }
+	  const ext = path.extname(file.name).toLowerCase();
+	  const filename = `book-${Date.now()}${ext}`;
+	  const uploadDir = path.join(__dirname, '../../uploads');
+	  const coversDir = path.join(uploadDir, 'covers');
+	  const thumbsDir = path.join(uploadDir, 'thumbnails');
+	  [uploadDir, coversDir, thumbsDir].forEach(dir => {
+			if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+	  });
+	  const coverPath = path.join(coversDir, filename);
+	  const thumbPath = path.join(thumbsDir, filename);
+	  await Promise.all([
+			file.mv(coverPath),
+			sharp(file.data)
+				.resize(300)
+				.toFile(thumbPath),
+		]);
+	  res.json({
+			filePath: `/uploads/covers/${filename}`,
+			thumbPath: `/uploads/thumbnails/${filename}`,
+	  });
 	}
 	catch (err) {
-		console.error(err);
-		res.status(500).json({ error: 'Error uploading file' });
+	  console.error('Upload error:', err);
+	  res.status(500).json({ error: err.message });
 	}
 });
-
-// 📌 Route за изтриване на качени файлове (ако потребителят отмени качването)
 router.delete('/delete-uploaded', authAdmin, async (req, res) => {
 	try {
-		const filePath = path.join(__dirname, '../../uploads', req.body.filePath);
-		if (fs.existsSync(filePath)) {
-			fs.unlinkSync(filePath);
-		}
-		res.status(200).json({ message: 'File deleted' });
+	  const filename = path.basename(req.body.filePath);
+	  const filesToDelete = [
+			path.join(__dirname, '../../uploads/covers', filename),
+			path.join(__dirname, '../../uploads/thumbnails', filename),
+	  ];
+	  filesToDelete.forEach(filePath => {
+			if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+	  });
+	  res.status(200).json({ message: 'Files deleted' });
 	}
 	catch (err) {
-		console.error(err);
-		res.status(500).json({ error: 'Error deleting file' });
+	  console.error(err);
+	  res.status(500).json({ error: 'Error deleting files' });
 	}
 });
-
 // Delete books (protected route)
 router.delete('/:id', authAdmin, async (req, res) => {
 	try {
-	// ✅ ПРАВИЛНО: Използваме "Book"
- 	   await Book.findByIdAndDelete(req.params.id);
- 	   res.redirect('/books');
+		await Book.findByIdAndDelete(req.params.id);
+		res.redirect('/books');
 	}
 	catch (err) {
  	   console.error(err);

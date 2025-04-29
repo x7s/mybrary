@@ -1,23 +1,47 @@
-<div class="book-grid <%= large ? 'large' : '' %>">
-  <% books.forEach(book => { %>
-    <div class="book-card">
-      <% if (book.coverImagePath) { %>
-        <img src="<%= book.coverImagePath %>" alt="<%= book.title %> Cover" class="book-cover">
-      <% } else { %>
-        <div class="book-cover-placeholder">Все още няма корица</div>
-      <% } %>
-      <h3 class="book-title"><%= book.title %></h3>
-      <% if (book.author) { %>
-        <p class="book-author"><%= book.author.name %></p>
-      <% } else { %>
-        <p class="book-author">Неизвестен Автор</p>
-      <% } %>
-      <% if (book.publisher) { %>
-        <p class="book-publisher"><%= book.publisher.name %></p>
-      <% } else { %>
-        <p class="book-publisher">Неизвестен Потребител</p>
-      <% } %>
-      <a href="/books/<%= book.id %>" class="btn btn-primary">Вижте подробности</a>
-    </div>
-  <% }) %>
+<div class="wrapper" style="padding-left: 0px; padding-right: 0px;">
+  <div class="book-grid <%= large ? 'large' : '' %>">
+    <% books.forEach(book => { %>
+      <div class="book-card">
+        <% 
+          // Determine the correct image URL
+          let coverUrl;
+          if (book.coverImageUrl) {
+            coverUrl = book.coverImageUrl;
+          } else if (book.coverImagePath) {
+            // Handle both full paths and filenames
+            coverUrl = book.coverImagePath.includes('uploads/') 
+              ? book.coverImagePath 
+              : `/uploads/covers/${book.coverImagePath}`;
+          }
+        %>
+        
+        <% if (coverUrl) { %>
+          <img 
+            src="<%= coverUrl %>" 
+            alt="<%= book.title %> Cover" 
+            class="book-cover"
+            onerror="this.onerror=null;this.src='/uploads/default-cover.png';this.classList.add('broken-image')"
+          >
+        <% } else { %>
+          <div class="book-cover-placeholder">Все още няма корица</div>
+        <% } %>
+  
+        <h3 class="book-title"><%= book.title %></h3>
+        
+        <% if (book.author) { %>
+          <p class="book-author">От <a href="#"><%= book.author.name %></a></p>
+        <% } else { %>
+          <p class="book-author">От Неизвестен Автор</p>
+        <% } %>
+        
+        <% if (book.publisher) { %>
+          <p class="book-publisher">Добавено от <a href="#"><%= book.publisher.name %></a></p>
+        <% } else { %>
+          <p class="book-publisher">Добавено от Неизвестен Потребител</p>
+        <% } %>
+        
+        <a href="/books/<%= book.id %>" class="btn btn-primary">Вижте подробности</a>
+      </div>
+    <% }) %>
+  </div>
 </div>
