@@ -1,8 +1,10 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const fileUpload = require('express-fileupload');
+const flash = require('express-flash');
 const path = require('path');
 const session = require('express-session');
 const Book = require('./models/Book');
@@ -15,6 +17,7 @@ const errorHandler = require('./middleware/errorHandler');
 const apiAuthorRoutes = require('./routes/api/authorRoutes');
 const apiBookRoutes = require('./routes/api/bookRoutes');
 const apiPublisherRoutes = require('./routes/api/publisherRoutes');
+const uploadRoutes = require('./routes/api/uploadRoutes');
 
 // Import View routes
 const adminRoutes = require('./routes/views/adminRoutes');
@@ -45,9 +48,17 @@ app.use(
 app.use(cors());
 
 // Enable file uploads
-app.use(fileUpload());
+app.use(fileUpload({
+	useTempFiles: true,
+	tempFileDir: '/tmp/',
+	limits: { fileSize: 5 * 1024 * 1024 },
+	abortOnLimit: true,
+	responseOnLimit: 'File size too large',
+}));
 // Serve uploaded files
+app.use(express.static('public'));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/upload', uploadRoutes);
 
 // Connect to the database
 connectDB();
@@ -75,7 +86,7 @@ app.use(
 
 // Middleware to pass session data to all views
 app.use((req, res, next) => {
-	console.log('Admin session:', req.session.admin);
+	// console.log('Admin session:', req.session.admin);
 	res.locals.session = req.session;
 	next();
 });
@@ -87,6 +98,7 @@ app.use(express.json());
 
 // For PUT and DELETE methods
 app.use(methodOverride('_method'));
+app.use(flash());
 
 // EJS setup
 app.set('view engine', 'ejs');
@@ -111,6 +123,10 @@ const authorLimiter = rateLimit({
 	max: 50,
 	message: { error: 'Too many requests to authors, please try again later.' },
 });
+
+// Add these before your routes
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 // Apply rate-limiting to specific routes
 app.use('/api/', apiLimiter);
