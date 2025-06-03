@@ -10,7 +10,7 @@
       <div class="col-md-8 mx-auto">
         <div class="card shadow-sm">
           <div class="card-header bg-primary text-white">
-            <h4><i class="bi bi-person-lines-fill"></i> Администраторски профил</h4>
+            <h4><i class="bi bi-person-lines-fill"></i> Редакция на Администраторския профил</h4>
           </div>
           
           <div class="card-body">
@@ -24,34 +24,34 @@
               <form action="/admin/profile" method="POST">
                 <!-- Name Field -->
                 <div class="mb-3">
-                  <label>Full Name</label>
+                  <label>Пълно име</label>
                   <input type="text" name="name" class="form-control" 
                          value="<%= admin.name %>" required>
                 </div>
               
                 <!-- Email Field -->
                 <div class="mb-3">
-                  <label>Email</label>
+                  <label>Имейл</label>
                   <input type="email" name="email" class="form-control"
                          value="<%= admin.email %>" required>
                 </div>
               
                 <!-- Password Change -->
                 <div class="card mb-3">
-                  <div class="card-header">Change Password</div>
+                  <div class="card-header">Промяна на паролата</div>
                   <div class="card-body">
                     <div class="mb-3">
-                      <label>Current Password</label>
+                      <label>Текуща парола</label>
                       <input type="password" name="currentPassword" class="form-control">
                     </div>
                     <div class="mb-3">
-                      <label>New Password</label>
+                      <label>Нова парола</label>
                       <input type="password" name="newPassword" class="form-control">
                     </div>
                   </div>
                 </div>
               
-                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="submit" class="btn btn-primary">Запази промените</button>
               </form>
           </div>
         </div>

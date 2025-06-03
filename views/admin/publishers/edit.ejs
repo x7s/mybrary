@@ -1,50 +1,14 @@
 <!DOCTYPE html>
 <html lang="bg">
 <head>
-  <%- include('../../partials/header') %>
-  <title>Редактиране на издател</title>
-  <style>
-    .form-container {
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 2rem;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    }
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-    }
-    .form-control {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #ced4da;
-      border-radius: 4px;
-      font-size: 1rem;
-    }
-    textarea.form-control {
-      min-height: 120px;
-    }
-    .btn-row {
-      display: flex;
-      gap: 1rem;
-      margin-top: 2rem;
-    }
-    .text-danger {
-      color: #dc3545;
-    }
-  </style>
+  <%- include('../../partials/admin_header') %>
+  <title>Редактиране на потребител</title>
 </head>
 <body>
   <main class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h1 class="mb-0">
-        <i class="bi bi-pencil-square"></i> Редактиране на издател
+        <i class="bi bi-pencil-square"></i> Редактиране на потребител: <%= publisher.name %>
       </h1>
       <a href="/admin/publishers" class="btn btn-secondary">
         <i class="bi bi-arrow-left"></i> Назад
@@ -70,7 +34,7 @@
                  style="width: 80px; height: 80px; object-fit: cover;"
                  id="avatarPreview">
             <div>
-              <input type="file" id="avatarUpload" name="avatar" accept="image/*" class="d-none">
+              <input type="file" id="avatarUpload" name="avatar" accept="images/*" class="d-none">
               <button type="button" class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('avatarUpload').click()">
                 <i class="bi bi-upload"></i> Качи снимка
               </button>
@@ -83,7 +47,7 @@
           </div>
         </div>
         <div class="form-group">
-          <label for="name">Име на издателство:</label>
+          <label for="name">Име на потребител:</label>
           <input type="text" id="name" name="name" class="form-control" 
                  value="<%= publisher.name %>" required>
         </div>
@@ -162,8 +126,6 @@
 
   <%- include('../../partials/footer') %>
   
-  <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
   <script>
     // Preview uploaded image
     document.getElementById('avatarUpload').addEventListener('change', function(e) {
